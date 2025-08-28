@@ -132,6 +132,15 @@ def main():
                                     print("You reached your water intake goal YAY!!!")
                                 else:
                                     print(f"Keep drinking! You need {goal_amount_daily - total:.2f} more {goal_unit}.")
+                                    percent_doned = (total / goal_amount_daily)
+                                    if percent_doned > 100:
+                                        percent_doned = 100
+                                    bar_size = 20
+                                    fill_amountd  = int(bar_size * total / goal_amount_daily)
+                                    bar = '█' * fill_amountd + '-' * (bar_size - fill_amountd)
+                                    print(f"[{bar}] {percent_doned:1f}% of daily goal completed")
+
+                                    
                         except FileNotFoundError:
                             print("No water log found. Start logging water intake first")
 
@@ -158,6 +167,13 @@ def main():
                                 print("You reached your water intake goal YAY!!!!")
                             else:
                                 print(f"Keep drinking! You need {goal_amount_weekly - total:.2f} more {goal_unit} of water.")
+                                percent_donew = (total / goal_amount_weekly)
+                                if percent_donew > 100:
+                                    percent_donem = 100
+                                bar_size = 20 
+                                fill_amountw = int(bar_size * total / goal_amount_weekly)
+                                bar = '█' * fill_amountw + '-' * (bar_size - fill_amountw)
+                                print(f"[{bar}] {percent_donew:1f}% of daily goal completed")
                         except FileNotFoundError:
                             print("No water log found. Start logging water intake first")
 
@@ -184,6 +200,14 @@ def main():
                                     print("You reached your water intake goal YAY!!!!!")
                             else: 
                                 print(f"Keep drinking! You need {goal_amount_monthly - total:.2f} more {goal_unit} of water.")
+                                percent_donem = (total / goal_amount_monthly)
+                                if percent_donem > 100:
+                                    percent_donem = 100
+                                bar_size = 20 
+                                fill_amountm = int(bar_size * total / goal_amount_monthly)
+                                bar = '█' * fill_amountm + '-' * (bar_size - fill_amountm)
+                                print(f"[{bar}] {percent_donem:1f}% of daily goal completed")
+
                         except FileNotFoundError:
                             print("No water log found. Start logging water intake first")
                 
