@@ -2,8 +2,22 @@ import random
 from datetime import datetime, timedelta, date
 from datetime import date
 from dateutil.relativedelta import relativedelta
+import calendar
+
+# changing to milileter pretty much idk where to use
+conversions = {
+    "cups": 240,
+    "ounces": 29.57,
+    "liters": 1000,
+    "gallons": 3785,
+    "milliliters": 1
+}
+
+
 
 now = datetime.now()
+current_month = now.month 
+
 
 def log_water_intake(amount, unit, log_file="water_log.txt"):
     with open(log_file, "a") as f:
@@ -69,12 +83,27 @@ def main():
                         try:
                             goal_amount_weekly = float(input(f"How many {goal_unit} of water do you want to drink per week? "))
                             print(f"Your weekly goal is set to {goal_amount_weekly} {goal_unit}")
+                            perweek = goal_amount_weekly/7
+                            print(f"You need to drink {perweek} {goal_unit} to meet ur weekly goal")
                         except ValueError:
                             print("Invalid input. Please enter a valid number.")
                     elif dwm == "monthly":
                         try:
                             goal_amount_monthly = float(input(f"How many {goal_unit} of water do you want to drink per month? "))
                             print(f"Your monthly goal is set to {goal_amount_monthly} {goal_unit}")
+                            permonthAJSN = goal_amount_monthly/30
+                            permonthJMMJAOD = goal_amount_monthly/31
+                            permonthF = goal_amount_monthly/28
+                            if current_month in [4, 6, 9, 11]:
+                                print(f"You need to drink {permonthAJSN} {goal_unit} everyday to meet your goal")
+
+                            elif current_month in [1, 3, 5, 7, 8, 10, 12]:
+                                print(f"You need to drink {permonthJMMJAOD} {goal_unit} everyday to meet your goal")
+
+                            elif current_month == "2":
+                                print(f"You need to drink {permonthF} {goal_unit} everyday to meet your goal")
+                            
+                            
                         except ValueError:
                             print("Invalid input. Please enter a valid number")
 
@@ -92,14 +121,17 @@ def main():
                                 for line in f:
                                     timestamp, entry = line.split(": ", 1)
                                     entry_date = datetime.fromisoformat(timestamp.strip()).date()
-                                    if entry_date == today and goal_unit in entry:
-                                        amount = float(entry.strip().split()[0])
-                                        total += amount
-                                print(f"Today's water intake is {total} {goal_unit}")
+                                    if entry_date == today:
+                                        amount, unit = entry.strip().split()[:2]
+                                        amount = float(amount)
+                                        unit = unit.lower()
+                                        total += amount * conversions[unit] / conversions[goal_unit]
+
+                                print(f"Today's water intake is {total:.2f} {goal_unit}")
                                 if total >= goal_amount_daily:
                                     print("You reached your water intake goal YAY!!!")
                                 else:
-                                    print(f"Keep drinking! You need {goal_amount_daily - total} more {goal_unit} of water.")
+                                    print(f"Keep drinking! You need {goal_amount_daily - total:.2f} more {goal_unit}.")
                         except FileNotFoundError:
                             print("No water log found. Start logging water intake first")
 
@@ -115,37 +147,47 @@ def main():
                                 for line in f:
                                     timestamp, entry = line.split(": ", 1)
                                     entry_date = datetime.fromisoformat(timestamp.strip()).date()
-                                    if last_week <= entry_date <= today and goal_unit in entry:
-                                        amount = float(entry.strip().split()[0])
-                                        total += amount
-                            print(f"This weeks water intake is {total} {goal_unit}")
+                                    if last_week <= entry_date <= today:
+                                        amount, unit = entry.strip().split()[:2]
+                                        amount = float(amount)
+                                        unit = unit.lower()
+                                        total += amount * conversions[unit] / conversions[goal_unit]
+
+                            print(f"This weeks water intake is {total: .2f} {goal_unit}")
                             if total >= goal_amount_weekly:
                                 print("You reached your water intake goal YAY!!!!")
                             else:
-                                print(f"Keep drinking! You need {goal_amount_weekly - total} more {goal_unit} of water.")
+                                print(f"Keep drinking! You need {goal_amount_weekly - total:.2f} more {goal_unit} of water.")
                         except FileNotFoundError:
                             print("No water log found. Start logging water intake first")
 
                 if checkwhat == "monthly":
-                    if goal_unit is None or goal_amount_monthly:
+                    if goal_unit is None or goal_amount_monthly is None:
                         print("No monthly goal set. Please set a goal first")
                     else:
                         try:
                             today = date.today()
                             last_month = today - relativedelta(months=1)
                             total = 0
-                            with open("water_log.txt", "r"):
+                            with open("water_log.txt", "r") as f:
                                 for line in f:
                                     timestamp, entry = line.split(": ", 1)
                                     entry_date = datetime.fromisoformat(timestamp.strip()).date()
-                                    if last_month <= entry_date <= today and goal_unit in entry:
-                                            amount = float(entry.strip().split()[0])
-                                            total += amount
-                                print(f"This months water intake is {total} {goal_unit}")
-                                if total >= goal_amount_monthly:
+                                    if last_month <= entry_date <= today:
+                                        amount, unit = entry.strip().split()[:2]
+                                        amount = float(amount)
+                                        unit = unit.lower()
+                                        total += amount * conversions[unit] / conversions[goal_unit]
+
+                            print(f"This months water intake is {total} {goal_unit}")
+                            if total >= goal_amount_monthly:
                                     print("You reached your water intake goal YAY!!!!!")
-                        except FileExistsError:
+                            else: 
+                                print(f"Keep drinking! You need {goal_amount_monthly - total:.2f} more {goal_unit} of water.")
+                        except FileNotFoundError:
                             print("No water log found. Start logging water intake first")
+                
+                
 
 
                             
