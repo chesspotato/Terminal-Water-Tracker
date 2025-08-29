@@ -3,6 +3,7 @@ from datetime import datetime, timedelta, date
 from datetime import date
 from dateutil.relativedelta import relativedelta
 import calendar
+import json
 
 # changing to milileter pretty much idk where to use
 conversions = {
@@ -17,6 +18,31 @@ conversions = {
 
 now = datetime.now()
 current_month = now.month 
+
+goal_file = "water_goal.json"
+
+
+def save_goal(daily, weekly, monthly, unit):
+    goals = {
+        "daily": daily,
+        "weekly": weekly,
+        "monthly": monthly,
+        "unit": unit
+    }
+
+    with open(goal_file, "w") as f:
+        json.dump(goals, f)
+
+
+def load_goals():
+    try:
+        with open(goal_file, "r") as f:
+            goals =  json.load(f)
+        return goals["daily"], goals["weekly"], goals["monthly"], goals["unit"]
+    except FileNotFoundError:
+        return None, None, None, None
+
+
 
 
 def log_water_intake(amount, unit, log_file="water_log.txt"):
@@ -34,10 +60,9 @@ def show_log(log_file="water_log.txt"):
 def main():
     print("Water Intake Tracker")
     valid_units = ["gallons", "liters", "cups", "milliliters", "ounces"]
-    goal_unit = None
-    goal_amount_daily = None
-    goal_amount_weekly = None
-    goal_amount_monthly = None
+    goal_amount_daily, goal_amount_weekly, goal_amount_monthly, goal_unit = load_goals()
+
+
 
     while True:
         print("\nOptions:")
@@ -77,12 +102,14 @@ def main():
                         try:
                             goal_amount_daily = float(input(f"How many {goal_unit} of water do you want to drink per day? "))
                             print(f"Your daily goal is set to {goal_amount_daily} {goal_unit}.")
+                            save_goal(goal_amount_daily, goal_amount_weekly, goal_amount_monthly, goal_unit)
                         except ValueError:
                             print("Invalid input. Please enter a valid number.")
                     elif dwm == "weekly":
                         try:
                             goal_amount_weekly = float(input(f"How many {goal_unit} of water do you want to drink per week? "))
                             print(f"Your weekly goal is set to {goal_amount_weekly} {goal_unit}")
+                            save_goal(goal_amount_daily, goal_amount_weekly, goal_amount_monthly, goal_unit)
                             perweek = goal_amount_weekly/7
                             print(f"You need to drink {perweek} {goal_unit} to meet ur weekly goal")
                         except ValueError:
@@ -91,6 +118,7 @@ def main():
                         try:
                             goal_amount_monthly = float(input(f"How many {goal_unit} of water do you want to drink per month? "))
                             print(f"Your monthly goal is set to {goal_amount_monthly} {goal_unit}")
+                            save_goal(goal_amount_daily, goal_amount_weekly, goal_amount_monthly, goal_unit)
                             permonthAJSN = goal_amount_monthly/30
                             permonthJMMJAOD = goal_amount_monthly/31
                             permonthF = goal_amount_monthly/28
