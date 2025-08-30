@@ -18,8 +18,9 @@ conversions = {
 
 now = datetime.now()
 current_month = now.month 
-
+today = date.today
 goal_file = "water_goal.json"
+
 
 
 def save_goal(daily, weekly, monthly, unit):
@@ -57,10 +58,63 @@ def show_log(log_file="water_log.txt"):
     except FileNotFoundError:
         print("No log file found. Start by logging your water intake!")
 
+
+def streak_check(goal_amount_daily, goal_unit, conversions):
+    try:
+        with open("water_log.txt", "r") as f:
+            readlines = f.readlines()
+            total_days = 0
+
+            for line in readlines:
+                timestamp, entry = line.split(": ", 1)
+                entry_date = datetime.fromisoformat(timestamp.strip()).date()
+                if entry_date == today:
+                    amount, unit = entry.strip().split()[:2]
+                    amount = float(amount)
+
+                    if unit.lower() in conversions:
+                        amount = amount * conversions[unit.lower()] / conversions[goal_unit]
+
+                    total_days += amount
+
+            if total_days == 0:
+                return
+
+
+
+            streak = 0
+            for days_back in range(30):
+                day = today - timedelta(days=days_back)
+                total = 0
+                for line in readlines:
+                    timestamp, entry = line.split(": ", 1)
+                    entry_date = datetime.fromisoformat(timestamp.strip()).date()
+                    if entry_date == day:
+                        amount, unit = entry.strip().strip()[": " 2]
+                        amount = float(amount)
+
+                        if unit.lower() in conversions:
+                            amount = amount * conversions[unit.lower()] / conversions[goal_unit]
+
+                        total += amount
+                    if total >= goal_amount_daily:
+                        streak += 1
+                    else:
+                        break
+
+            print(f"🔥 Streak: {streak} day getting your water goal")
+    
+    except FileNotFoundError:
+        print("No water log found. Start logging water intake first")
+
+
 def main():
     print("Water Intake Tracker")
     valid_units = ["gallons", "liters", "cups", "milliliters", "ounces"]
     goal_amount_daily, goal_amount_weekly, goal_amount_monthly, goal_unit = load_goals()
+
+
+
 
 
 
@@ -70,8 +124,9 @@ def main():
         print("2. Show log")
         print("3. Goal")
         print("4. Clear Log")
-        print("5. Fun Facts About Water")
-        print("6. Exit")
+        print("5. Streak")
+        print("6. Fun Facts About Water")
+        print("7. Exit")
         choice = input("Select an option (1/2/3/4): ").strip()
 
         if choice == "1":
@@ -257,7 +312,14 @@ def main():
             else:
                 print("Invalid input. Water log not cleared.")
 
+
+
         elif choice == "5":
+            streak_check(goal_amount_daily, goal_unit, conversions)
+
+
+
+        elif choice == "6":
             waterfacts = [
                 "Water covers about 71% of the Earth", 
                 "97% of Earth's water is salty",
@@ -280,7 +342,7 @@ def main():
             random_fact = random.choice(waterfacts)
             print(random_fact)
 
-        elif choice == "6":
+        elif choice == "7":
             print("Exiting tracker. Stay hydrated!")
             break
 
@@ -290,3 +352,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+    
