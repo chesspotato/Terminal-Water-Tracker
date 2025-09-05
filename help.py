@@ -118,7 +118,7 @@ def streak_check(goal_amount_daily, goal_unit, conversions, unlocked):
                     timestamp, entry = line.split(": ", 1)
                     entry_date = datetime.fromisoformat(timestamp.strip()).date()
                     if entry_date == day:
-                        amount, unit = entry.strip().strip()[:2]
+                        amount, unit = entry.strip().split()[:2]
                         amount = float(amount)
 
                         if unit.lower() in conversions:
@@ -320,7 +320,7 @@ def main():
                                 print(f"Keep drinking! You need {goal_amount_weekly - total:.2f} more {goal_unit} of water.")
                                 percent_donew = (total / goal_amount_weekly)
                                 if percent_donew > 100:
-                                    percent_donem = 100
+                                    percent_donew = 100
                                 bar_size = 20 
                                 fill_amountw = int(bar_size * total / goal_amount_weekly)
                                 bar = '█' * fill_amountw + '-' * (bar_size - fill_amountw)
