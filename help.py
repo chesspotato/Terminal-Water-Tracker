@@ -208,6 +208,7 @@ def main():
                     unlock_achievement("first_log", unlocked)
             except ValueError:
                 print("Invalid input. Please enter a valid number.")
+                continue
 
         elif choice == "2":
             show_log()
